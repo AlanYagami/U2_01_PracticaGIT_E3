@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Carros</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+     <link rel="stylesheet" href="./stylesCarro.css">
+</head>
+<body class="p-4">
+
+    <div class="logo-container mb-4">
+        <h1>Gestión de Carros</h1>
+    </div>
+
+    <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registroModal">Registrar</button>
+    </div>
+
+    <div id="cardsContainer" class="row row-cols-1 row-cols-md-3 g-4">
+        <!-- Cards dinámicas aquí -->
+    </div>
+
+    <!-- Modal de Registro -->
+    <div class="modal fade" id="registroModal" tabindex="-1" aria-labelledby="registroModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content rounded-4 shadow-sm">
+                <form id="formRegistro">
+                    <div class="modal-header" style="background-color:#041e46; color:white;">
+                        <h5 class="modal-title" id="registroModalLabel">Registrar Carro</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-2">
+                            <label class="form-label">Marca</label>
+                            <input type="text" class="form-control" id="marca" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Modelo</label>
+                            <input type="text" class="form-control" id="modelo" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Color</label>
+                            <input type="text" class="form-control" id="color" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Placa</label>
+                            <input type="text" class="form-control" id="placa" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Proveedor</label>
+                            <select id="proveedor" class="form-select" required></select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+        const cardsContainer = document.getElementById('cardsContainer');
+        const proveedorSelect = document.getElementById('proveedor');
+        const formRegistro = document.getElementById('formRegistro');
+
+        async function cargarProveedores() {
+            try {
+                const response = await fetch(`${API_URL}/proveedores`);
+                const proveedores = await response.json();
+                proveedorSelect.innerHTML = '';
+                proveedores.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p.id;
+                    option.textContent = p.nombre;
+                    proveedorSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error al cargar proveedores:', error);
+            }
+        }
+
+        async function cargarCarros() {
+            try {
+                const response = await fetch(`${API_URL}/carros`);
+                const carros = await response.json();
+                renderizarCards(carros);
+            } catch (error) {
+                console.error('Error al cargar carros:', error);
+            }
+        }
+
+        function renderizarCards(carros) {
+            cardsContainer.innerHTML = '';
+            carros.forEach(carro => {
+                const card = document.createElement('div');
+                card.className = 'col';
+                card.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-header">${carro.modelo}</div>
+                        <img src="https://via.placeholder.com/300x150?text=Auto" class="card-img-top" alt="Imagen">
+                        <div class="card-body">
+                            <p><strong>Marca:</strong> ${carro.marca}</p>
+                            <p><strong>Color:</strong> ${carro.color}</p>
+                            <a href="#" class="btn btn-primary btn-sm" onclick="alert('Marca: ${carro.marca}\\nColor: ${carro.color}\\nPlaca: ${carro.placa}')">Ver más</a>
+                            <button class="btn btn-warning btn-sm ms-1">Actualizar</button>
+                            <button class="btn btn-danger btn-sm ms-1" onclick="eliminarCarro(${carro.id})">Eliminar</button>
+                        </div>
+                    </div>
+                `;
+                cardsContainer.appendChild(card);
+            });
+        }
+
+        formRegistro.addEventListener('submit', async e => {
+            e.preventDefault();
+            const nuevoCarro = {
+                marca: document.getElementById('marca').value,
+                modelo: document.getElementById('modelo').value,
+                color: document.getElementById('color').value,
+                placa: document.getElementById('placa').value,
+                proveedorId: proveedorSelect.value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/carros`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(nuevoCarro)
+                });
+
+                if (!response.ok) throw new Error('Error al registrar el carro');
+                await cargarCarros();
+                formRegistro.reset();
+                bootstrap.Modal.getInstance(document.getElementById('registroModal')).hide();
+            } catch (error) {
+                console.error(error);
+                alert('No se pudo registrar el carro');
+            }
+        });
+
+        async function eliminarCarro(id) {
+            if (!confirm('¿Estás seguro de eliminar este carro?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/carros/${id}`, { method: 'DELETE' });
+                if (!response.ok) throw new Error('Error al eliminar el carro');
+                await cargarCarros();
+            } catch (error) {
+                console.error(error);
+                alert('No se pudo eliminar el carro');
+            }
+        }
+
+        cargarProveedores();
+        cargarCarros();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
