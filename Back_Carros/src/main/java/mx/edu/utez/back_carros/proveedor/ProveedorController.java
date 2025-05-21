@@ -1,15 +1,16 @@
 package mx.edu.utez.back_carros.proveedor;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/proveedores")
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/proveedores")
 public class ProveedorController {
+
     private final ProveedorService service;
 
     public ProveedorController(ProveedorService service) {
@@ -17,16 +18,14 @@ public class ProveedorController {
     }
 
     @GetMapping
-    public String listarProveedores(Model model) {
-        model.addAttribute("proveedores", service.listarTodos());
-        return "proveedores";
+    public List<Proveedor> listarProveedores() {
+        return service.listarTodos();
     }
 
     @PostMapping("/guardar")
-    public String guardarProveedor(@ModelAttribute Proveedor proveedor) {
+    public ResponseEntity<?> guardarProveedor(@RequestBody Proveedor proveedor) {
         service.guardar(proveedor);
-        return "redirect:/proveedores";
+        return ResponseEntity.ok().build();
     }
-
-
 }
+
