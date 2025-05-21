@@ -1,59 +1,132 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>NIXAN</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>NIXAN</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">NIXAN</a>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container-fluid">
-    
-    <a class="navbar-brand" href="#">NIXAN</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContenido"
+          aria-controls="navbarContenido"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContenido" aria-controls="navbarContenido" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+        <div class="collapse navbar-collapse" id="navbarContenido">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                href="#"
+                onclick="cargarSeccion('carro.html', this)"
+                >Carro</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="#"
+                onclick="cargarSeccion('ProveedorRegister.html', this)"
+                >Proveedor</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
 
-    <div class="collapse navbar-collapse" id="navbarContenido">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <a class="nav-link active" href="#" onclick="cargarSeccion('carro.html', this)">Carro</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#" onclick="cargarSeccion('ProveedorRegister.html', this)">Proveedor</a>
-        </li>
-      </ul>
+    <div class="container mt-4">
+      <div id="contenido">
+        <!-- Aquí se cargará el contenido dinámico -->
+      </div>
     </div>
-  </div>
-</nav>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      function cargarSeccion(url, elemento) {
+        console.log(`Cargando sección: ${url}`);
+        fetch(url)
+          .then((respuesta) => respuesta.text())
+          .then((html) => {
+            // Insertar el HTML en el contenedor
+            document.getElementById("contenido").innerHTML = html;
 
-<div class="container mt-4">
-  <div id="contenido">
-  </div>
-</div>
+            // Extraer y ejecutar scripts
+            ejecutarScriptsEnContenido();
 
-<script>
-  function cargarSeccion(url, elemento) {
-    fetch(url)
-      .then(respuesta => respuesta.text())
-      .then(html => {
-        document.getElementById('contenido').innerHTML = html;
-        document.querySelectorAll('.nav-link').forEach(link => {
-          link.classList.remove('active');
+            // Actualizar menú activo
+            document.querySelectorAll(".nav-link").forEach((link) => {
+              link.classList.remove("active");
+            });
+            elemento.classList.add("active");
+
+            console.log(`Sección ${url} cargada correctamente`);
+
+            // Si es la página de proveedores, asegurarse de que se inicialice correctamente
+            if (url === "ProveedorRegister.html") {
+              console.log(
+                "Ejecutando inicialización específica para la página de proveedores"
+              );
+              // La función inicializarPagina ahora se llama automáticamente al cargar el script
+            }
+          })
+          .catch((error) => {
+            document.getElementById("contenido").innerHTML =
+              "<p>Error al cargar el contenido.</p>";
+            console.error("Error cargando:", error);
+          });
+      }
+
+      // Función para ejecutar los scripts del contenido cargado
+      function ejecutarScriptsEnContenido() {
+        const contenido = document.getElementById("contenido");
+
+        // Buscar todos los scripts en el contenido
+        const scriptElements = contenido.querySelectorAll("script");
+
+        scriptElements.forEach((script) => {
+          // Crear un nuevo elemento script
+          const newScript = document.createElement("script");
+
+          // Copiar todos los atributos
+          Array.from(script.attributes).forEach((attr) => {
+            newScript.setAttribute(attr.name, attr.value);
+          });
+
+          // Copiar el contenido del script
+          newScript.textContent = script.textContent;
+
+          // Eliminar el script original
+          script.parentNode.removeChild(script);
+
+          // Añadir el nuevo script que se ejecutará
+          document.body.appendChild(newScript);
         });
-        elemento.classList.add('active');
-      })
-      .catch(error => {
-        document.getElementById('contenido').innerHTML = '<p>Error al cargar el contenido.</p>';
-        console.error('Error cargando:', error);
-      });
-  }
 
-  window.onload = () => cargarSeccion('carro.html', document.querySelector('.nav-link'));
-</script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
-</body>
+        console.log(
+          `Ejecutados ${scriptElements.length} scripts del contenido`
+        );
+      }
+
+      // Cargar la sección inicial cuando la página se carga
+      window.onload = () => {
+        console.log("Cargando página inicial");
+        cargarSeccion("carro.html", document.querySelector(".nav-link.active"));
+      };
+    </script>
+  </body>
 </html>

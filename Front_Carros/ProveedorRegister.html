@@ -1,151 +1,261 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestión de Proveedores</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="./stylesProveedor.css">
-</head>
-<body>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="./stylesProveedor.css" />
+  </head>
+  <body>
     <div class="container mt-4">
-        <div class="logo-container">
-            <i class="fas fa-truck-moving logo-icon"></i>
-            <h1>Gestión de Proveedores</h1>
+      <div class="logo-container">
+        <i class="fas fa-truck-moving logo-icon"></i>
+        <h1>Gestión de Proveedores</h1>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-5">
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-user-plus me-2"></i>Registro de Nuevo Proveedor
+            </div>
+            <div class="card-body">
+              <form id="proveedorForm">
+                <div class="mb-3">
+                  <label for="nombre" class="form-label">Nombre</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nombre"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="telefono" class="form-label">Teléfono</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="telefono"
+                    oninput="this.value = this.value.replace(/\D/g, '')"
+                    maxlength="10"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="form-label"
+                    >Correo Electrónico</label
+                  >
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    required
+                  />
+                </div>
+                <div class="text-end">
+                  <button
+                    type="button"
+                    class="btn btn-secondary me-2"
+                    id="limpiarBtn"
+                  >
+                    Limpiar
+                  </button>
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>Guardar Proveedor
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
 
-        <div class="row">
-            <div class="col-lg-5">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-user-plus me-2"></i>Registro de Nuevo Proveedor
-                    </div>
-                    <div class="card-body">
-                        <form id="proveedorForm">
-                            <div class="mb-3">
-                                <label for="nombre" class="form-label">Nombre</label>
-                                <input type="text" class="form-control" id="nombre" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="telefono" class="form-label">Teléfono</label>
-                                <input type="tel" class="form-control" id="telefono" oninput="this.value = this.value.replace(/\D/g, '')" maxlength="10" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Correo Electrónico</label>
-                                <input type="email" class="form-control" id="email" required>
-                            </div>
-                            <div class="text-end">
-                                <button type="button" class="btn btn-secondary me-2" id="limpiarBtn" onclick="limpiarFormulario(event)">Limpiar</button>
-                                <button type="submit" class="btn btn-primary" onclick="guardarProveedor(event)">
-                                    <i class="fas fa-save me-1"></i>Guardar Proveedor
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+        <div class="col-lg-7">
+          <div class="card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <span><i class="fas fa-list me-2"></i>Lista de Proveedores</span>
+              <div class="input-group" style="max-width: 300px">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Buscar proveedor..."
+                  id="buscarProveedor"
+                />
+                <button class="btn btn-outline-secondary" type="button">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
             </div>
-
-            <div class="col-lg-7">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-list me-2"></i>Lista de Proveedores</span>
-                        <div class="input-group" style="max-width: 300px;">
-                            <input type="text" class="form-control" placeholder="Buscar proveedor..." id="buscarProveedor">
-                            <button class="btn btn-outline-secondary" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Nombre</th>
-                                        <th>Categoría</th>
-                                        <th>Teléfono</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="listaProveedores">
-                                </tbody>
-                            </table>
-                        </div>
-                        <div id="sinProveedores" class="text-center py-4">
-                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                            <p class="lead text-muted">No hay proveedores registrados</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Categoría</th>
+                      <th>Teléfono</th>
+                    </tr>
+                  </thead>
+                  <tbody id="listaProveedores"></tbody>
+                </table>
+              </div>
+              <div id="sinProveedores" class="text-center py-4">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <p class="lead text-muted">No hay proveedores registrados</p>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script>
-    let proveedores = [];
+      // Variable global para almacenar los proveedores
+      let proveedores = [];
 
-    async function actualizarVistaProveedores() {
+      // Función para obtener los proveedores del servidor
+      async function actualizarVistaProveedores() {
+        console.log("Intentando obtener proveedores...");
         try {
-            const response = await fetch('http://localhost:8080/api/proveedores');
-            proveedores = await response.json();
-            renderizarProveedores(proveedores);
+          const response = await fetch("http://localhost:8080/api/proveedores");
+          console.log(
+            "Respuesta del servidor:",
+            response.status,
+            response.statusText
+          );
+          if (!response.ok) {
+            console.error("Error en la respuesta del servidor");
+            return;
+          }
+
+          proveedores = await response.json();
+          console.log("Proveedores obtenidos:", proveedores);
+          renderizarProveedores(proveedores);
         } catch (error) {
-            console.error('Error al obtener proveedores:', error);
+          console.error("Error al obtener proveedores:", error);
         }
-    }
+      }
 
-    function renderizarProveedores(data) {
-        const lista = data.map(p => `
-            <tr>
-                <td>${p.nombre}</td>
-                <td>${p.categoria || '-'}</td>
-                <td>${p.telefono}</td>
-            </tr>
-        `).join('');
+      // Función para mostrar los proveedores en la tabla
+      function renderizarProveedores(data) {
+        const listaProveedores = document.getElementById("listaProveedores");
+        const sinProveedores = document.getElementById("sinProveedores");
+
+        console.log("Renderizando proveedores:", data.length);
+
+        const lista = data
+          .map(
+            (p) => `
+        <tr>
+            <td>${p.nombre}</td>
+            <td>${p.categoria || "-"}</td>
+            <td>${p.telefono}</td>
+        </tr>
+    `
+          )
+          .join("");
+
         listaProveedores.innerHTML = lista;
-        sinProveedores.style.display = data.length ? 'none' : 'block';
-    }
+        sinProveedores.style.display = data.length ? "none" : "block";
+      }
 
-    async function guardarProveedor(event) {
+      // Función para guardar un nuevo proveedor
+      async function guardarProveedor(event) {
         event.preventDefault();
+        console.log("Guardando proveedor...");
+
         const data = {
-            nombre: document.getElementById('nombre').value,
-            telefono: document.getElementById('telefono').value,
-            email: document.getElementById('email').value
+          nombre: document.getElementById("nombre").value,
+          telefono: document.getElementById("telefono").value,
+          email: document.getElementById("email").value,
         };
 
+        console.log("Datos a enviar:", data);
+
         try {
-            const response = await fetch('http://localhost:8080/api/proveedores/guardar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-
-            if (response.ok) {
-                await actualizarVistaProveedores();
-                limpiarFormulario();
-            } else {
-                alert('Error al guardar proveedor');
+          const response = await fetch(
+            "http://localhost:8080/api/proveedores/guardar",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
             }
+          );
+
+          console.log(
+            "Respuesta al guardar:",
+            response.status,
+            response.statusText
+          );
+
+          if (response.ok) {
+            console.log("Proveedor guardado correctamente");
+            await actualizarVistaProveedores();
+            limpiarFormulario();
+          } else {
+            console.error("Error al guardar proveedor");
+          }
         } catch (error) {
-            console.error('Error al guardar proveedor:', error);
+          console.error("Error en la petición:", error);
         }
-    }
+      }
 
-    function limpiarFormulario() {
-        proveedorForm.reset();
-    }
+      // Función para limpiar el formulario
+      function limpiarFormulario(event) {
+        if (event) event.preventDefault();
+        document.getElementById("proveedorForm").reset();
+        console.log("Formulario limpiado");
+      }
 
-    proveedorForm.addEventListener('submit', guardarProveedor);
-    limpiarBtn.addEventListener('click', limpiarFormulario);
-    buscarProveedor.addEventListener('input', filtrarProveedores);
+      // Función para filtrar proveedores según la búsqueda
+      function filtrarProveedores() {
+        const busqueda = document
+          .getElementById("buscarProveedor")
+          .value.toLowerCase();
+        console.log("Filtrando por:", busqueda);
 
-    actualizarVistaProveedores();
-</script>
+        const proveedoresFiltrados = proveedores.filter(
+          (p) =>
+            p.nombre.toLowerCase().includes(busqueda) ||
+            (p.categoria && p.categoria.toLowerCase().includes(busqueda)) ||
+            p.telefono.includes(busqueda)
+        );
 
-</body>
+        renderizarProveedores(proveedoresFiltrados);
+      }
+
+      // Inicializar la página
+      function inicializarPagina() {
+        console.log("Inicializando página de proveedores...");
+
+        // Configurar los eventos
+        document
+          .getElementById("proveedorForm")
+          .addEventListener("submit", guardarProveedor);
+        document
+          .getElementById("limpiarBtn")
+          .addEventListener("click", limpiarFormulario);
+        document
+          .getElementById("buscarProveedor")
+          .addEventListener("input", filtrarProveedores);
+
+        // Cargar los proveedores inmediatamente
+        actualizarVistaProveedores();
+      }
+
+      // Ejecutar la inicialización cuando el contenido esté listo
+      inicializarPagina();
+    </script>
+  </body>
 </html>
