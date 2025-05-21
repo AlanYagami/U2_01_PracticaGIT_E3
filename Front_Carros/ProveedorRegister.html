@@ -36,8 +36,8 @@
                                 <input type="email" class="form-control" id="email" required>
                             </div>
                             <div class="text-end">
-                                <button type="button" class="btn btn-secondary me-2" id="limpiarBtn">Limpiar</button>
-                                <button type="submit" class="btn btn-primary">
+                                <button type="button" class="btn btn-secondary me-2" id="limpiarBtn" onclick="limpiarFormulario(event)">Limpiar</button>
+                                <button type="submit" class="btn btn-primary" onclick="guardarProveedor(event)">
                                     <i class="fas fa-save me-1"></i>Guardar Proveedor
                                 </button>
                             </div>
@@ -65,7 +65,6 @@
                                         <th>Nombre</th>
                                         <th>Categoría</th>
                                         <th>Teléfono</th>
-                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="listaProveedores">
@@ -83,46 +82,70 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
-        
-        function limpiarFormulario() {
-            proveedorForm.reset();
+    let proveedores = [];
+
+    async function actualizarVistaProveedores() {
+        try {
+            const response = await fetch('http://localhost:8080/api/proveedores');
+            proveedores = await response.json();
+            renderizarProveedores(proveedores);
+        } catch (error) {
+            console.error('Error al obtener proveedores:', error);
         }
-        
-        function filtrarProveedores() {
-            const terminoBusqueda = buscarProveedor.value.toLowerCase();
-            if (terminoBusqueda === '') {
-                actualizarVistaProveedores();
-                return;
-            }
-            
-            const filtrados = proveedores.filter(proveedor => 
-                proveedor.nombre.toLowerCase().includes(terminoBusqueda) ||
-                proveedor.categoria.toLowerCase().includes(terminoBusqueda) ||
-                proveedor.telefono.includes(terminoBusqueda)
-            );
-            
-            if (filtrados.length === 0) {
-                listaProveedores.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="text-center py-3">
-                            <i class="fas fa-search fa-2x text-muted mb-2"></i>
-                            <p class="text-muted">No se encontraron resultados para "${terminoBusqueda}"</p>
-                        </td>
-                    </tr>
-                `;
-                sinProveedores.style.display = 'none';
+    }
+
+    function renderizarProveedores(data) {
+        const lista = data.map(p => `
+            <tr>
+                <td>${p.nombre}</td>
+                <td>${p.categoria || '-'}</td>
+                <td>${p.telefono}</td>
+            </tr>
+        `).join('');
+        listaProveedores.innerHTML = lista;
+        sinProveedores.style.display = data.length ? 'none' : 'block';
+    }
+
+    async function guardarProveedor(event) {
+        event.preventDefault();
+        const data = {
+            nombre: document.getElementById('nombre').value,
+            telefono: document.getElementById('telefono').value,
+            email: document.getElementById('email').value
+        };
+
+        try {
+            const response = await fetch('http://localhost:8080/api/proveedores/guardar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                await actualizarVistaProveedores();
+                limpiarFormulario();
             } else {
-                sinProveedores.style.display = 'none';
-                renderizarProveedores(filtrados);
+                alert('Error al guardar proveedor');
             }
+        } catch (error) {
+            console.error('Error al guardar proveedor:', error);
         }
-        
-        proveedorForm.addEventListener('submit', guardarProveedor);
-        limpiarBtn.addEventListener('click', limpiarFormulario);
-        buscarProveedor.addEventListener('input', filtrarProveedores);
-        
-        actualizarVistaProveedores();
-    </script>
+    }
+
+    function limpiarFormulario() {
+        proveedorForm.reset();
+    }
+
+    proveedorForm.addEventListener('submit', guardarProveedor);
+    limpiarBtn.addEventListener('click', limpiarFormulario);
+    buscarProveedor.addEventListener('input', filtrarProveedores);
+
+    actualizarVistaProveedores();
+</script>
+
 </body>
 </html>

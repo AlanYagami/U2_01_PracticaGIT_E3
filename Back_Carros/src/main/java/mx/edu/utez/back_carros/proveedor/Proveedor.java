@@ -15,6 +15,6 @@ public class Proveedor {
     private Long id;
 
     private String nombre;
-    private int telefono;
-    private String correo;
+    private String telefono;
+    private String email;
 }
